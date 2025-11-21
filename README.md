@@ -142,3 +142,28 @@ Here is a graph showing the comparison of `TNS` post-synthesis vs post-routing f
   - Realistic clock tree effects (skew, latency)
   - Interconnect-dominated delays
   - Impact of physical proximity & coupling
+
+#### Why Post-Route Timing Differs from Pre-Route Timing
+
+- **Estimated vs Actual Delays**: Pre-route timing (post-synthesis) uses wire-load and fanout-based models to estimate delays, while post-route timing uses accurate parasitic data extracted from the final routed layout.  
+- **Clock Network Realism**: Pre-route assumes ideal clock with no skew or latency; post-route includes real clock tree delays, buffer insertion, and skew effects from routing.  
+- **Interconnect Details**: Actual wire lengths, resistances, and capacitances are known post-route, unlike approximations pre-route, causing real interconnect delays to be accounted for.  
+- **Critical Path Changes**: Post-route analysis can reveal new critical paths or worsen existing paths due to routing effects and proximity.  
+- **Accuracy Levels**: Post-route STA achieves higher correlation (~95-98%) to silicon timing than pre-route (~70-80%) due to real physical data integration.
+
+#### How SPEF Annotation Affects Path Delays
+
+- **Parasitic Extraction**: SPEF files provide detailed resistance and capacitance (RC) parasitic values for wires and vias after routing.  
+- **Accurate Delay Modeling**: Annotating SPEF parasitics to the timing graph allows STA tools to compute realistic delays rather than estimates.  
+- **Coupling Capacitance**: SPEF includes coupling capacitances between adjacent nets, which contribute to crosstalk delay effects in timing calculations.  
+- **Delay Impact on Paths**: Added parasitics from SPEF increase propagation delays on nets, often making paths slower and affecting slack values significantly.
+
+#### Impact of Physical Effects on Timing Closure
+
+- **Capacitance Effects**: Increased parasitic capacitance slows down signal transitions, raising path delays and risking setup violations.  
+- **Resistance Effects**: Wire and via resistance cause RC delay buildup, lengthening signal travel time along paths.  
+- **Coupling Effects**: Crosstalk from coupled capacitances introduces noise and additional delay uncertainty, potentially causing hold violations.  
+- **Physical Proximity & Layout**: Closely routed nets experience stronger coupling; longer routes introduce higher parasitics, stressing timing margins.  
+- **Timing Closure Challenges**: These physical effects exposed post-routing often require design adjustments such as buffer insertion, re-routing, or logic optimization to meet timing.
+
+This detailed understanding explains why post-route STA is the gold standard for timing sign-off, revealing hidden issues and guiding final design closure effectively.
